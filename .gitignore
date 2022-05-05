@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 #aaron trusty testing files
-./at_test/*
-./not_sub/*
+at_test/*
+not_sub/*
