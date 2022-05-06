@@ -1,6 +1,5 @@
 import sys
 import math
-import numpy as np
 
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
