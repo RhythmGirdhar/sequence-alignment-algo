@@ -5,13 +5,14 @@ import numpy as np
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
 
-delta = 30
-alphaTable = {
-        "A": {"A": 0, "C": 110, "G": 48, "T": 94},
-        "C": {"A": 110, "C": 0, "G": 118, "T": 48}, 
-        "G": {"A": 48, "C": 118, "G": 0, "T": 110}, 
-        "T": {"A": 94, "C": 48, "G": 110, "T": 0}
-}
+DELTA = 30
+
+ALPHA = {
+            "A": {"A": 0, "C": 110, "G": 48, "T": 94},
+            "C": {"A": 110, "C": 0, "G": 118, "T": 48}, 
+            "G": {"A": 48, "C": 118, "G": 0, "T": 110}, 
+            "T": {"A": 94, "C": 48, "G": 110, "T": 0}
+        }
 
 def generateSequences(inputFile):
 
@@ -66,14 +67,14 @@ M = []
 #TODO - AT: there will be a bug here somewhere cause i only use Y lmfao
 
 # initialize the M values (first row & first column) as their gap penalties
-zArr = [z*delta for z in range(len(Y)+1)]
+zArr = [z*DELTA for z in range(len(Y)+1)]
 iArr = []
 iArr.append(zArr)
 #TODO - AT: change to -245 if this works
 for y in range(len(Y)):
     # -1 if we havent found the value yet
     jArr = [-1 for j in range(len(X)+1)]
-    jArr[0] = (y+1)*delta
+    jArr[0] = (y+1)*DELTA
     iArr.append(jArr)
 
 # M is the memoized array
@@ -82,15 +83,15 @@ M = iArr
 # Sequence Alignment Recurrence Relation
 # OPT(i, j) = min(
 #       alpha_xi_yj + OPT(i-1, j-1), # case 1 - they match
-#       delta + OPT(i-1, j), # case 2 - they dont match update X index
-#       delta + OPT(i, j-1) # case 3 - they dont match update Y index
+#       DELTA + OPT(i-1, j), # case 2 - they dont match update X index
+#       DELTA + OPT(i, j-1) # case 3 - they dont match update Y index
 #  )
 # print(X)
 # print(Y)
 
 def OPT(X,Y, lenX, lenY):
     
-    both = alphaTable[X[lenX-1]][Y[lenY-1]]
+    both = ALPHA[X[lenX-1]][Y[lenY-1]]
 
     if (M[lenX-1][lenY-1] == -1) :
         both += OPT(X, Y, lenX-1, lenY-1)
@@ -98,14 +99,14 @@ def OPT(X,Y, lenX, lenY):
         both += M[lenX-1][lenY-1]
 
     
-    just_i = delta
+    just_i = DELTA
     if (M[lenX][lenY-1] == -1) :
         just_i += OPT(X, Y, lenX, lenY-1)
     else :
         just_i += M[lenX][lenY-1]
 
     
-    just_j = delta
+    just_j = DELTA
     if (M[lenX-1][lenY] == -1) :
         just_j += OPT(X, Y, lenX-1, lenY)
     else :
