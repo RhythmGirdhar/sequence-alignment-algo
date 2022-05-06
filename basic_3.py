@@ -1,5 +1,4 @@
 import sys
-import math
 
 INPUT_FILE = sys.argv[1]
 OUTPUT_FILE = sys.argv[2]
@@ -13,6 +12,15 @@ ALPHA = {
 
 
 def generate_matching(s1: str, s2: str):
+    """
+    This function generates the matching for s1 and s2
+    Parameters:
+        s1: First string
+        s2: Second string
+    Returns:
+        matching_s1: Matching for string s1
+        matching_s2: Matching for string s2
+    """
     m = len(s1)
     n = len(s2)
     opt = memoize(x, y)
