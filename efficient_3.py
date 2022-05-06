@@ -64,3 +64,20 @@ def generate_matching(s1: str, s2: str):
         cur_j -= 1
     return matching_s1[::-1], matching_s2[::-1]
 
+def generate_sequences(input_file: str) -> (str, str):
+    """
+    This function generates input sequences from the base strings and insertion indices
+    Parameters:
+        input_file: The file containing the base strings and insertion indices
+    Returns:
+        S1, S2: The 2 generated sequences
+    """
+    f = open(input_file, "r")
+    s1 = " "
+    s2 = " "
+    return s1, s2
+
+x, y = generate_sequences(INPUT_FILE)
+matching_x, matching_y = generate_matching(x, y)
+print(matching_x)
+print(matching_y)
