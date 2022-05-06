@@ -131,3 +131,4 @@ dmypy.json
 #aaron trusty testing files
 at_test/*
 not_sub/*
+fake_datapoints/*
