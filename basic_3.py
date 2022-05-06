@@ -33,9 +33,9 @@ def generate_matching(s1: str, s2: str):
     matching_s1 = ""
     matching_s2 = ""
     while cur_i > 0 and cur_j > 0:
-        cost_s1_s2 = opt[cur_i - 1][cur_j - 1]
-        cost_s1_delta = opt[cur_i - 1][cur_j]
-        cost_s2_delta = opt[cur_i][cur_j - 1]
+        cost_s1_s2 = opt[cur_i - 1][cur_j - 1] + ALPHA[s1[cur_i - 1]][s2[cur_j - 1]]
+        cost_s1_delta = opt[cur_i - 1][cur_j] + DELTA
+        cost_s2_delta = opt[cur_i][cur_j - 1] + DELTA
         prev = min(
             cost_s1_s2,
             cost_s1_delta,
