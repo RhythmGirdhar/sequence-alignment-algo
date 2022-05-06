@@ -19,21 +19,21 @@ basicTimeVsSize = {}
 for filePath in paths:
     f = open(filePath, "r")
     content = f.read().split('\n')
-    basicTimeVsSize[float(content[3])] = len(content[1]) + len(content[2])
+    basicTimeVsSize[float(content[3])] = float(content[4])
 
 sortedBasic = {k: v for k, v in sorted(basicTimeVsSize.items(), key=lambda item: item[1])}
 
 print(sortedBasic)
 
 basicTimes = []
-basicSizes = []
+basicMem = []
 
 for basicTime,basicSize in sortedBasic.items():
     basicTimes.append(basicTime)
-    basicSizes.append(basicSize)
+    basicMem.append(basicSize)
 
 fig, ax = plt.subplots(figsize=(5, 2.7), layout='constrained')
-ax.plot(basicSizes, basicTimes, label='basic')
+ax.plot(basicMem, basicTimes, label='basic')
 #ax.plot(x, x**2, label='memory efficient')
 ax.set_xlabel('problem size')
 ax.set_ylabel('cpu time')
