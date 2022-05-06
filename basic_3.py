@@ -1,4 +1,7 @@
 import sys
+import time
+import os
+import psutil
 
 INPUT_FILE = sys.argv[1]
 OUTPUT_FILE = sys.argv[2]
@@ -20,11 +23,11 @@ def generate_matching(s1: str, s2: str):
     Returns:
         matching_s1: Matching for string s1
         matching_s2: Matching for string s2
+        opt[m][n]: Minimum cost of the matching between s1 and s2
     """
     m = len(s1)
     n = len(s2)
     opt = memoize(x, y)
-    print(opt[m][n])
     cur_i = m
     cur_j = n
     matching_s1 = ""
@@ -63,7 +66,7 @@ def generate_matching(s1: str, s2: str):
         matching_s2 += s2[cur_j - 1]
         matching_s1 += "_"
         cur_j -= 1
-    return matching_s1[::-1], matching_s2[::-1]
+    return matching_s1[::-1], matching_s2[::-1], opt[m][n]
 
 
 def memoize(s1: str, s2: str) -> [[int]]:
@@ -100,41 +103,41 @@ def generate_sequences(input_file: str) -> (str, str):
     Returns:
         S1, S2: The 2 generated sequences
     """
-    f = open(input_file, "r")
-    s1 = ""
-    s2 = ""
-    end_of_s1 = False
-    j = 0  # Variables to store number of index inputs to s1
-    k = 0  # Variables to store number of index inputs to s2
-    len_s1 = 0
-    len_s2 = 0
-    for line in f.readlines():
-        line = line.strip("\n")
-        if not s1:
-            s1 = line
-            len_s1 = len(line)
-        else:
-            # Check whether line represents string or index
-            if line.isnumeric():
-                index = int(line)
-                if not end_of_s1:
-                    cur_len = len(s1)
-                    j += 1
-                    new_string = s1[:index + 1] + s1
-                    if index + 1 < cur_len:
-                        new_string += s1[index + 1:]
-                    s1 = new_string
-                else:
-                    cur_len = len(s2)
-                    k += 1
-                    new_string = s2[:index + 1] + s2
-                    if index + 1 < cur_len:
-                        new_string += s2[index + 1:]
-                    s2 = new_string
+    with open(input_file, "r") as f:
+        s1 = ""
+        s2 = ""
+        end_of_s1 = False
+        j = 0  # Variables to store number of index inputs to s1
+        k = 0  # Variables to store number of index inputs to s2
+        len_s1 = 0
+        len_s2 = 0
+        for line in f.readlines():
+            line = line.strip("\n")
+            if not s1:
+                s1 = line
+                len_s1 = len(line)
             else:
-                s2 = line
-                len_s2 = len(line)
-                end_of_s1 = True
+                # Check whether line represents string or index
+                if line.isnumeric():
+                    index = int(line)
+                    if not end_of_s1:
+                        cur_len = len(s1)
+                        j += 1
+                        new_string = s1[:index + 1] + s1
+                        if index + 1 < cur_len:
+                            new_string += s1[index + 1:]
+                        s1 = new_string
+                    else:
+                        cur_len = len(s2)
+                        k += 1
+                        new_string = s2[:index + 1] + s2
+                        if index + 1 < cur_len:
+                            new_string += s2[index + 1:]
+                        s2 = new_string
+                else:
+                    s2 = line
+                    len_s2 = len(line)
+                    end_of_s1 = True
 
     # Verify that the strings are generated correctly
     assert len(s1) == len_s1 * (2 ** j)
@@ -142,7 +145,16 @@ def generate_sequences(input_file: str) -> (str, str):
     return s1, s2
 
 
+start_time = time.time()
 x, y = generate_sequences(INPUT_FILE)
-matching_x, matching_y = generate_matching(x, y)
-print(matching_x)
-print(matching_y)
+matching_x, matching_y, min_cost = generate_matching(x, y)
+end_time = time.time()
+time_taken = 1000*(end_time-start_time)
+process = psutil.Process(os.getpid())
+memory_used = int(process.memory_info().rss / 1024)
+with open(OUTPUT_FILE, "w") as f:
+    f.write(str(min_cost)+"\n")
+    f.write(matching_x+"\n")
+    f.write(matching_y+"\n")
+    f.write(str(time_taken)+"\n")
+    f.write(str(memory_used)+"\n")
