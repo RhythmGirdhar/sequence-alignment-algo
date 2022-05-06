@@ -1,131 +1,160 @@
 import sys
-import math
+import time
+import os
+import psutil
 
-inputFile = sys.argv[1]
-outputFile = sys.argv[2]
-
+INPUT_FILE = sys.argv[1]
+OUTPUT_FILE = sys.argv[2]
 DELTA = 30
-
 ALPHA = {
-            "A": {"A": 0, "C": 110, "G": 48, "T": 94},
-            "C": {"A": 110, "C": 0, "G": 118, "T": 48}, 
-            "G": {"A": 48, "C": 118, "G": 0, "T": 110}, 
-            "T": {"A": 94, "C": 48, "G": 110, "T": 0}
-        }
+    "A": {"A": 0, "C": 110, "G": 48, "T": 94},
+    "C": {"A": 110, "C": 0, "G": 118, "T": 48},
+    "G": {"A": 48, "C": 118, "G": 0, "T": 110},
+    "T": {"A": 94, "C": 48, "G": 110, "T": 0}
+}
 
-def generateSequences(inputFile):
 
-    f = open(inputFile, "r")
-
-    # parse input and get counts
-    baseDict = {}
-    firstString = ""
-    lastString = ""
-    for line in f.readlines():
-        # remove spaces and newlines
-        # check if numeric, if so then that is an index
-        # if not, then that is a base string
-        strippedLine = line.strip().replace("\n", "")
-        if(strippedLine.isnumeric()):
-            prevIdxList = baseDict[lastString]
-            prevIdxList.append(strippedLine)
+def generate_matching(s1: str, s2: str):
+    """
+    This function generates the matching for s1 and s2
+    Parameters:
+        s1: First string
+        s2: Second string
+    Returns:
+        matching_s1: Matching for string s1
+        matching_s2: Matching for string s2
+        opt[m][n]: Minimum cost of the matching between s1 and s2
+    """
+    m = len(s1)
+    n = len(s2)
+    opt = memoize(x, y)
+    cur_i = m
+    cur_j = n
+    matching_s1 = ""
+    matching_s2 = ""
+    while cur_i > 0 and cur_j > 0:
+        cost_s1_s2 = opt[cur_i - 1][cur_j - 1] + ALPHA[s1[cur_i - 1]][s2[cur_j - 1]]
+        cost_s1_delta = opt[cur_i - 1][cur_j] + DELTA
+        cost_s2_delta = opt[cur_i][cur_j - 1] + DELTA
+        prev = min(
+            cost_s1_s2,
+            cost_s1_delta,
+            cost_s2_delta
+        )
+        if prev == cost_s1_delta:
+            # If (cur_i)th character of s1 is not matched
+            matching_s1 += s1[cur_i - 1]
+            matching_s2 += "_"
+            cur_i -= 1
+        elif prev == cost_s2_delta:
+            # If (cur_j)th character of s2 is not matched
+            matching_s1 += "_"
+            matching_s2 += s2[cur_j - 1]
+            cur_j -= 1
         else:
-            if(lastString == ""):
-                firstString = strippedLine
-            lastString = strippedLine
-            baseDict[lastString] = []
+            # Both (cur_i)th and (cur_j)th characters are present in the matching
+            matching_s1 += s1[cur_i - 1]
+            matching_s2 += s2[cur_j - 1]
+            cur_i -= 1
+            cur_j -= 1
 
-    #2j *  len(s1) and 2. Please note that the base strings need not have to be of equal k * len(s2)
+    while cur_i > 0:
+        matching_s1 += s1[cur_i - 1]
+        matching_s2 += "_"
+        cur_i -= 1
+    while cur_j > 0:
+        matching_s2 += s2[cur_j - 1]
+        matching_s1 += "_"
+        cur_j -= 1
+    return matching_s1[::-1], matching_s2[::-1], opt[m][n]
 
-    lenX = math.pow(2, len(baseDict[firstString])) * len(firstString)
-    lenY = math.pow(2, len(baseDict[lastString])) * len(lastString)
 
-    X = firstString
-    Y = lastString
+def memoize(s1: str, s2: str) -> [[int]]:
+    """
+    This function generates the memoization table for matching s1 and s2
+    Parameters:
+        s1: First string
+        s2: Second string
+    Returns:
+        opt: Memoization table
+    """
+    m = len(s1)
+    n = len(s2)
+    opt = [[0 for _ in range(n + 1)] for _ in range(m + 1)]
+    for i in range(m + 1):
+        opt[i][0] = i * DELTA
+    for j in range(n + 1):
+        opt[0][j] = j * DELTA
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            opt[i][j] = min(
+                ALPHA[s1[i - 1]][s2[j - 1]] + opt[i - 1][j - 1],
+                DELTA + opt[i - 1][j],
+                DELTA + opt[i][j - 1]
+            )
+    return opt
 
-    # generate X
-    for idx in baseDict[firstString]:
-        firstSection = X[:int(idx)+1]
-        secondSection = X[int(idx)+1:]
-        X = firstSection + X + secondSection
 
-    # generate Y
-    for idx in baseDict[lastString]:
-        firstSection = Y[:int(idx)+1]
-        secondSection = Y[int(idx)+1:]
-        Y = firstSection + Y + secondSection
+def generate_sequences(input_file: str) -> (str, str):
+    """
+    This function generates input sequences from the base strings and insertion indices
+    Parameters:
+        input_file: The file containing the base strings and insertion indices
+    Returns:
+        S1, S2: The 2 generated sequences
+    """
+    with open(input_file, "r") as f:
+        s1 = ""
+        s2 = ""
+        end_of_s1 = False
+        j = 0  # Variables to store number of index inputs to s1
+        k = 0  # Variables to store number of index inputs to s2
+        len_s1 = 0
+        len_s2 = 0
+        for line in f.readlines():
+            line = line.strip("\n")
+            if not s1:
+                s1 = line
+                len_s1 = len(line)
+            else:
+                # Check whether line represents string or index
+                if line.isnumeric():
+                    index = int(line)
+                    if not end_of_s1:
+                        cur_len = len(s1)
+                        j += 1
+                        new_string = s1[:index + 1] + s1
+                        if index + 1 < cur_len:
+                            new_string += s1[index + 1:]
+                        s1 = new_string
+                    else:
+                        cur_len = len(s2)
+                        k += 1
+                        new_string = s2[:index + 1] + s2
+                        if index + 1 < cur_len:
+                            new_string += s2[index + 1:]
+                        s2 = new_string
+                else:
+                    s2 = line
+                    len_s2 = len(line)
+                    end_of_s1 = True
 
-    assert(len(X) == lenX)
-    assert(len(Y) == lenY)
-    return X, Y
+    # Verify that the strings are generated correctly
+    assert len(s1) == len_s1 * (2 ** j)
+    assert len(s2) == len_s2 * (2 ** k)
+    return s1, s2
 
-X, Y = generateSequences(inputFile)
 
-M = []
-
-#TODO - AT: there will be a bug here somewhere cause i only use Y lmfao
-
-# initialize the M values (first row & first column) as their gap penalties
-zArr = [z*DELTA for z in range(len(Y)+1)]
-iArr = []
-iArr.append(zArr)
-#TODO - AT: change to -245 if this works
-for y in range(len(Y)):
-    # -1 if we havent found the value yet
-    jArr = [-1 for j in range(len(X)+1)]
-    jArr[0] = (y+1)*DELTA
-    iArr.append(jArr)
-
-# M is the memoized array
-M = iArr
-
-# Sequence Alignment Recurrence Relation
-# OPT(i, j) = min(
-#       alpha_xi_yj + OPT(i-1, j-1), # case 1 - they match
-#       DELTA + OPT(i-1, j), # case 2 - they dont match update X index
-#       DELTA + OPT(i, j-1) # case 3 - they dont match update Y index
-#  )
-# print(X)
-# print(Y)
-
-def OPT(X,Y, lenX, lenY):
-    
-    both = ALPHA[X[lenX-1]][Y[lenY-1]]
-
-    if (M[lenX-1][lenY-1] == -1) :
-        both += OPT(X, Y, lenX-1, lenY-1)
-    else :
-        both += M[lenX-1][lenY-1]
-
-    
-    just_i = DELTA
-    if (M[lenX][lenY-1] == -1) :
-        just_i += OPT(X, Y, lenX, lenY-1)
-    else :
-        just_i += M[lenX][lenY-1]
-
-    
-    just_j = DELTA
-    if (M[lenX-1][lenY] == -1) :
-        just_j += OPT(X, Y, lenX-1, lenY)
-    else :
-        just_j += M[lenX-1][lenY]
-
-    
-    M[lenX][lenY] = min(both, just_i, just_j)
-    return M[lenX][lenY]
-
-c = OPT(X, Y, len(X), len(Y))
-print(c)
-
-# for i in range(1, len(X)):
-#     for j in range(1, len(Y)):
-#         if(X[i] == Y[j]):
-#             print(X[i], Y[j], alphaTable[ X[i]] [Y[j]], M[i-1][j-1])
-#             M[i][j] = alphaTable[ X[i]] [Y[j]] + M[i-1][j-1]
-#         elif(len(X) > len(Y)):
-#             print('try2')
-#             M[i][j] = 1
-#         elif(len(X) < len(Y)):
-#             print('try3')
-#             M[i][j] = 2
+start_time = time.time()
+x, y = generate_sequences(INPUT_FILE)
+matching_x, matching_y, min_cost = generate_matching(x, y)
+end_time = time.time()
+time_taken = 1000*(end_time-start_time)
+process = psutil.Process(os.getpid())
+memory_used = int(process.memory_info().rss / 1024)
+with open(OUTPUT_FILE, "w") as f:
+    f.write(str(min_cost)+"\n")
+    f.write(matching_x+"\n")
+    f.write(matching_y+"\n")
+    f.write(str(time_taken)+"\n")
+    f.write(str(memory_used)+"\n")
