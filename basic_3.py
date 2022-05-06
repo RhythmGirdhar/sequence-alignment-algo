@@ -4,8 +4,9 @@ import math
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
 
-delta = 30
-alphaTable = {
+DELTA = 30
+
+ALPHA = {
             "A": {"A": 0, "C": 110, "G": 48, "T": 94},
             "C": {"A": 110, "C": 0, "G": 118, "T": 48}, 
             "G": {"A": 48, "C": 118, "G": 0, "T": 110}, 
@@ -76,8 +77,8 @@ M = iArr
 # Sequence Alignment Recurrence Relation
 # OPT(i, j) = min(
 #       alpha_xi_yj + OPT(i-1, j-1), # case 1 - they match
-#       delta + OPT(i-1, j), # case 2 - they dont match update X index
-#       delta + OPT(i, j-1) # case 3 - they dont match update Y index
+#       DELTA + OPT(i-1, j), # case 2 - they dont match update X index
+#       DELTA + OPT(i, j-1) # case 3 - they dont match update Y index
 #  )
 print(X)
 print(Y)
@@ -85,8 +86,8 @@ print(Y)
 for i in range(1, len(X)):
     for j in range(1, len(Y)):
         if(X[i] == Y[j]):
-            print(X[i], Y[j], alphaTable[ X[i]] [Y[j]], M[i-1][j-1])
-            M[i][j] = alphaTable[ X[i]] [Y[j]] + M[i-1][j-1]
+            print(X[i], Y[j], ALPHA[ X[i]] [Y[j]], M[i-1][j-1])
+            M[i][j] = ALPHA[ X[i]] [Y[j]] + M[i-1][j-1]
         elif(len(X) > len(Y)):
             print('try2')
             M[i][j] = 1
