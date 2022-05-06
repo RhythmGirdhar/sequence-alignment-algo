@@ -72,7 +72,7 @@ iArr.append(zArr)
 #TODO - AT: change to -245 if this works
 for y in range(len(Y)):
     # -1 if we havent found the value yet
-    jArr = [-1 for j in range(len(X))]
+    jArr = [-1 for j in range(len(X)+1)]
     jArr[0] = (y+1)*delta
     iArr.append(jArr)
 
@@ -87,17 +87,45 @@ M = iArr
 #  )
 # print(X)
 # print(Y)
-for m in M:
-    print(m)
-exit()
-for i in range(1, len(X)):
-    for j in range(1, len(Y)):
-        if(X[i] == Y[j]):
-            print(X[i], Y[j], alphaTable[ X[i]] [Y[j]], M[i-1][j-1])
-            M[i][j] = alphaTable[ X[i]] [Y[j]] + M[i-1][j-1]
-        elif(len(X) > len(Y)):
-            print('try2')
-            M[i][j] = 1
-        elif(len(X) < len(Y)):
-            print('try3')
-            M[i][j] = 2
+
+def OPT(X,Y, lenX, lenY):
+    
+    both = alphaTable[X[lenX-1]][Y[lenY-1]]
+
+    if (M[lenX-1][lenY-1] == -1) :
+        both += OPT(X, Y, lenX-1, lenY-1)
+    else :
+        both += M[lenX-1][lenY-1]
+
+    
+    just_i = delta
+    if (M[lenX][lenY-1] == -1) :
+        just_i += OPT(X, Y, lenX, lenY-1)
+    else :
+        just_i += M[lenX][lenY-1]
+
+    
+    just_j = delta
+    if (M[lenX-1][lenY] == -1) :
+        just_j += OPT(X, Y, lenX-1, lenY)
+    else :
+        just_j += M[lenX-1][lenY]
+
+    
+    M[lenX][lenY] = min(both, just_i, just_j)
+    return M[lenX][lenY]
+
+c = OPT(X, Y, len(X), len(Y))
+print(c)
+
+# for i in range(1, len(X)):
+#     for j in range(1, len(Y)):
+#         if(X[i] == Y[j]):
+#             print(X[i], Y[j], alphaTable[ X[i]] [Y[j]], M[i-1][j-1])
+#             M[i][j] = alphaTable[ X[i]] [Y[j]] + M[i-1][j-1]
+#         elif(len(X) > len(Y)):
+#             print('try2')
+#             M[i][j] = 1
+#         elif(len(X) < len(Y)):
+#             print('try3')
+#             M[i][j] = 2
