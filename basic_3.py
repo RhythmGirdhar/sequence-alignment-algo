@@ -32,13 +32,13 @@ def generate_matching(s1: str, s2: str):
         )
         if prev == cost_s1_delta:
             # If (cur_i)th character of s1 is not matched
-            matching_s1 += s1[cur_i-1]
+            matching_s1 += s1[cur_i - 1]
             matching_s2 += "_"
             cur_i -= 1
         elif prev == cost_s2_delta:
             # If (cur_j)th character of s2 is not matched
             matching_s1 += "_"
-            matching_s2 += s2[cur_j-1]
+            matching_s2 += s2[cur_j - 1]
             cur_j -= 1
         else:
             # Both (cur_i)th and (cur_j)th characters are present in the matching
@@ -47,10 +47,14 @@ def generate_matching(s1: str, s2: str):
             cur_i -= 1
             cur_j -= 1
 
-    while len(matching_s1) > len(matching_s2):
+    while cur_i > 0:
+        matching_s1 += s1[cur_i - 1]
         matching_s2 += "_"
-    while len(matching_s1) < len(matching_s2):
+        cur_i -= 1
+    while cur_j > 0:
+        matching_s2 += s2[cur_j - 1]
         matching_s1 += "_"
+        cur_j -= 1
     return matching_s1[::-1], matching_s2[::-1]
 
 
