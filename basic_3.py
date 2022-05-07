@@ -14,7 +14,7 @@ ALPHA = {
 }
 
 
-def generate_matching(s1: str, s2: str):
+def generate_matching(s1: str, s2: str) -> (str, str, int):
     """
     This function generates the matching for s1 and s2
     Parameters:
@@ -27,7 +27,7 @@ def generate_matching(s1: str, s2: str):
     """
     m = len(s1)
     n = len(s2)
-    opt = memoize(x, y)
+    opt = memoize(s1, s2)
     cur_i = m
     cur_j = n
     matching_s1 = ""
