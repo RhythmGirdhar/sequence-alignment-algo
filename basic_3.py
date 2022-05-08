@@ -14,7 +14,7 @@ ALPHA = {
 }
 
 
-def generate_matching(s1: str, s2: str) -> (str, str, int):
+def generate_matching(s1: str, s2: str):
     """
     This function generates the matching for s1 and s2
     Parameters:
@@ -69,7 +69,7 @@ def generate_matching(s1: str, s2: str) -> (str, str, int):
     return matching_s1[::-1], matching_s2[::-1], opt[m][n]
 
 
-def memoize(s1: str, s2: str) -> [[int]]:
+def memoize(s1: str, s2: str):
     """
     This function generates the memoization table for matching s1 and s2
     Parameters:
@@ -95,7 +95,7 @@ def memoize(s1: str, s2: str) -> [[int]]:
     return opt
 
 
-def generate_sequences(input_file: str) -> (str, str):
+def generate_sequences(input_file: str):
     """
     This function generates input sequences from the base strings and insertion indices
     Parameters:

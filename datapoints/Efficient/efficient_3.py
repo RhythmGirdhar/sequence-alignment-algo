@@ -14,7 +14,7 @@ ALPHA = {
 }
 
 
-def find_cost_arr(s1: str, s2: str):
+def find_cost_arr(s1: str, s2: str) -> [int]:
     """
     This function finds the memoization table for matching s1 and s2 in a memory efficient way
     Parameters:
@@ -45,7 +45,7 @@ def find_cost_arr(s1: str, s2: str):
     return opt_arr[1]
 
 
-def generate_matching_optimized(s1: str, s2: str):
+def generate_matching_optimized(s1: str, s2: str) -> (str, str, int):
     """
     This function generates the matching for s1 and s2 using the DNC with DP approach
     Parameters:
@@ -107,7 +107,7 @@ def generate_matching_optimized(s1: str, s2: str):
     return left_matching_large+right_matching_large, left_matching_small+right_matching_small, left_cost+right_cost
 
 
-def generate_sequences(input_file: str):
+def generate_sequences(input_file: str) -> (str, str):
     """
     This function generates input sequences from the base strings and insertion indices
     Parameters:

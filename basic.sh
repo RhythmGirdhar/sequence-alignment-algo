@@ -1,1 +1,15 @@
-python3 basic.py
+python3 basic_3.py in1.txt out1.txt
+python3 basic_3.py in2.txt out2.txt
+python3 basic_3.py in3.txt out3.txt
+python3 basic_3.py in4.txt out4.txt
+python3 basic_3.py in5.txt out5.txt
+python3 basic_3.py in6.txt out6.txt
+python3 basic_3.py in7.txt out7.txt
+python3 basic_3.py in8.txt out8.txt
+python3 basic_3.py in9.txt out9.txt
+python3 basic_3.py in10.txt out10.txt
+python3 basic_3.py in11.txt out11.txt
+python3 basic_3.py in12.txt out12.txt
+python3 basic_3.py in13.txt out13.txt
+python3 basic_3.py in14.txt out14.txt
+python3 basic_3.py in15.txt out15.txt
