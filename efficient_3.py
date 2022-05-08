@@ -54,7 +54,7 @@ def generate_matching_optimized(s1: str, s2: str) -> (str, str, int):
     Returns:
         matching_s1: Matching for string s1
         matching_s2: Matching for string s2
-        opt[m][n]: Minimum cost of the matching between s1 and s2
+        opt_cost: Minimum cost of the matching between s1 and s2
     """
     m = len(s1)
     n = len(s2)
