@@ -30,8 +30,10 @@ def find_cost_arr(s1: str, s2: str) -> [int]:
         opt_arr[1][j] = j * DELTA
     cur_s1_idx = 1
     while cur_s1_idx < m+1:
+        # Copy the results of previous iteration
         for j in range(n+1):
             opt_arr[0][j] = opt_arr[1][j]
+        # Update the new values of the memoization table
         opt_arr[1][0] = opt_arr[0][0] + DELTA
         for j in range(1, n+1):
             opt_arr[1][j] = min(
@@ -79,8 +81,14 @@ def generate_matching_optimized(s1: str, s2: str) -> (str, str, int):
         large_str_len = m
 
     large_str_mid = large_str_len // 2
+    '''
+    Calculate the memoization tables for matching the larger strings' halves with every possible length of the 
+    smaller string
+    '''
     large_left_opt = find_cost_arr(large_str[:large_str_mid], small_str)
     large_right_opt = find_cost_arr(large_str[large_str_mid:][::-1], small_str[::-1])
+
+    # Find the optimal split position for the smaller string
     split_opt_len = len(large_left_opt)
     min_split_cost = DELTA*(m+n)
     split_position = 0
@@ -88,6 +96,8 @@ def generate_matching_optimized(s1: str, s2: str) -> (str, str, int):
         if large_left_opt[i]+large_right_opt[split_opt_len-1-i] < min_split_cost:
             min_split_cost = large_left_opt[i]+large_right_opt[split_opt_len-1-i]
             split_position = i
+
+    # Recursively find the matchings for the 2 sub-problems and combine the results
     left_matching_large, left_matching_small, left_cost = \
         generate_matching_optimized(large_str[:large_str_mid], small_str[:split_position])
     right_matching_large, right_matching_small, right_cost = \
