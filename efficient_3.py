@@ -80,7 +80,7 @@ def generate_matching_optimized(s1: str, s2: str) -> (str, str, int):
 
     large_str_mid = large_str_len // 2
     large_left_opt = find_cost_arr(large_str[:large_str_mid], small_str)
-    large_right_opt = find_cost_arr(large_str[large_str_mid::-1], small_str[::-1])
+    large_right_opt = find_cost_arr(large_str[large_str_mid:][::-1], small_str[::-1])
     split_opt_len = len(large_left_opt)
     min_split_cost = DELTA*(m+n)
     split_position = 0
@@ -92,33 +92,9 @@ def generate_matching_optimized(s1: str, s2: str) -> (str, str, int):
         generate_matching_optimized(large_str[:large_str_mid], small_str[:split_position])
     right_matching_large, right_matching_small, right_cost = \
         generate_matching_optimized(large_str[large_str_mid:], small_str[split_position:])
+    if n == large_str_len:
+        return left_matching_small+right_matching_small, left_matching_large+right_matching_large, left_cost+right_cost
     return left_matching_large+right_matching_large, left_matching_small+right_matching_small, left_cost+right_cost
-
-
-def memoize(s1: str, s2: str) -> [[int]]:
-    """
-    This function generates the memoization table for matching s1 and s2
-    Parameters:
-        s1: First string
-        s2: Second string
-    Returns:
-        opt: Memoization table
-    """
-    m = len(s1)
-    n = len(s2)
-    opt = [[0 for _ in range(n + 1)] for _ in range(m + 1)]
-    for i in range(m + 1):
-        opt[i][0] = i * DELTA
-    for j in range(n + 1):
-        opt[0][j] = j * DELTA
-    for i in range(1, m + 1):
-        for j in range(1, n + 1):
-            opt[i][j] = min(
-                ALPHA[s1[i - 1]][s2[j - 1]] + opt[i - 1][j - 1],
-                DELTA + opt[i - 1][j],
-                DELTA + opt[i][j - 1]
-            )
-    return opt
 
 
 def generate_sequences(input_file: str) -> (str, str):
