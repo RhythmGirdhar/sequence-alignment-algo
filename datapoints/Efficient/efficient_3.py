@@ -1,3 +1,4 @@
+#Authors - Rhythm Girdhar, Aaron Trusty, Aman Bhat
 import sys
 import time
 import os
@@ -14,7 +15,7 @@ ALPHA = {
 }
 
 
-def find_cost_arr(s1: str, s2: str) -> [int]:
+def find_cost_arr(s1: str, s2: str):
     """
     This function finds the memoization table for matching s1 and s2 in a memory efficient way
     Parameters:
@@ -45,7 +46,7 @@ def find_cost_arr(s1: str, s2: str) -> [int]:
     return opt_arr[1]
 
 
-def generate_matching_optimized(s1: str, s2: str) -> (str, str, int):
+def generate_matching_optimized(s1: str, s2: str):
     """
     This function generates the matching for s1 and s2 using the DNC with DP approach
     Parameters:
@@ -107,7 +108,7 @@ def generate_matching_optimized(s1: str, s2: str) -> (str, str, int):
     return left_matching_large+right_matching_large, left_matching_small+right_matching_small, left_cost+right_cost
 
 
-def generate_sequences(input_file: str) -> (str, str):
+def generate_sequences(input_file: str):
     """
     This function generates input sequences from the base strings and insertion indices
     Parameters:
@@ -156,14 +157,21 @@ def generate_sequences(input_file: str) -> (str, str):
     assert len(s2) == len_s2 * (2 ** k)
     return s1, s2
 
+time_array = []
+space_array = []
 
+process = psutil.Process(os.getpid())
 start_time = time.time()
 x, y = generate_sequences(INPUT_FILE)
+start_time = time.time()
 matching_x, matching_y, min_cost = generate_matching_optimized(x, y)
 end_time = time.time()
 time_taken = 1000 * (end_time - start_time)
-process = psutil.Process(os.getpid())
+time_array.append(time_taken)
+# process = psutil.Process(os.getpid())
 memory_used = int(process.memory_info().rss / 1024)
+space_array.append(memory_used)
+
 with open(OUTPUT_FILE, "w") as f:
     f.write(str(min_cost) + "\n")
     f.write(matching_x + "\n")
